@@ -166,26 +166,6 @@
 	containername = "\improper M41A extended magazines crate"
 	group = "Ammo"
 
-/datum/supply_packs/ammo_l42_mag_box
-	name = "Magazine box (L42A, 16x mags)"
-	contains = list(
-					/obj/item/ammo_box/magazine/l42a
-					)
-	cost = RO_PRICE_VERY_CHEAP
-	containertype = /obj/structure/closet/crate/ammo
-	containername = "\improper L42A magazines crate"
-	group = "Ammo"
-
-/datum/supply_packs/ammo_l42_mag_box_ap
-	name = "Magazine box (L42A, 16x AP mags)"
-	contains = list(
-					/obj/item/ammo_box/magazine/l42a/ap
-					)
-	cost = RO_PRICE_NORMAL
-	containertype = /obj/structure/closet/crate/ammo
-	containername = "\improper L42A AP magazines crate"
-	group = "Ammo"
-
 /datum/supply_packs/ammo_m44_mag_box
 	name = "Speed loaders box (M44, 16x)"
 	contains = list(
@@ -381,7 +361,6 @@
 					/obj/item/ammo_magazine/rifle/extended,
 					/obj/item/ammo_magazine/rifle/ap,
 					/obj/item/ammo_magazine/rifle/incendiary,
-					/obj/item/ammo_magazine/rifle/l42a/incendiary,
 					/obj/item/ammo_magazine/rifle/m41aMK1,
 					/obj/item/ammo_magazine/rifle/m41aMK1/ap,
 					/obj/item/ammo_magazine/rifle/m4ra,
@@ -405,9 +384,7 @@
 					/obj/item/ammo_magazine/shotgun,
 					/obj/item/ammo_magazine/shotgun/buckshot,
 					/obj/item/ammo_magazine/shotgun/buckshot,
-					/obj/item/ammo_magazine/shotgun/incendiary,
-					/obj/item/ammo_magazine/rifle/l42a/ap,
-					/obj/item/ammo_magazine/rifle/l42a
+					/obj/item/ammo_magazine/shotgun/incendiary
 					)
 	cost = RO_PRICE_PRICY
 	containertype = /obj/structure/closet/crate/ammo
