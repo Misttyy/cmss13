@@ -35,7 +35,7 @@ var/list/helmetmarkings_sql = list()
 var/list/glovemarkings = list()
 var/list/squad_colors = list(rgb(230,25,25), rgb(255,195,45), rgb(200,100,200), rgb(65,72,200), rgb(103,214,146), rgb(196, 122, 80), rgb(64, 0, 0))
 var/list/squad_colors_chat = list(rgb(230,125,125), rgb(255,230,80), rgb(255,150,255), rgb(130,140,255), rgb(103,214,146), rgb(196, 122, 80), rgb(64, 0, 0))
-
+var/flags_marine_armor = FALSE
 /proc/initialize_marine_armor()
 	var/i
 	for(i=1, i<(length(squad_colors) + 1), i++)
@@ -64,16 +64,59 @@ var/list/squad_colors_chat = list(rgb(230,125,125), rgb(255,230,80), rgb(255,150
 		glove.color = armor_color
 		glovemarkings += glove
 
+/obj/item/clothing/under/Initialize()
+	. = ..()
+	if(worn_state)
+		LAZYSET(item_state_slots, WEAR_JACKET, worn_state)
+	else
+		worn_state = icon_state
 
+	var/padless_state = "[worn_state]_p[contained_sprite ? "_su" : ""]"
+	var/ridgeless_state = "[worn_state]_r[contained_sprite ? "_su" : ""]"
+	var/check_icon = contained_sprite ? icon : default_onmob_icons[WEAR_JACKET]
+	var/list/check_icon_states = icon_states(check_icon)
 
+	//autodetect padless
+	if(padless_state in check_icon_states)
+		flags_marine_armor |= ARMOR_PADLESS
+	else if(flags_marine_armor & ARMOR_PADLESS)
+		flags_marine_armor &= ~ARMOR_PADLESS
+		log_debug("CLOTHING: Armor of name: \"[src.name]\" and type: \"[src.type]\" was flagged as having padless but could not detect a padless icon state.")
+
+	if(ridgeless_state in check_icon_states)
+		flags_marine_armor |= ARMOR_RIDGELESS
+	else if(flags_marine_armor & ARMOR_RIDGELESS)
+		flags_marine_armor &= ~ARMOR_RIDGELESS
+		log_debug("CLOTHING: Armor of name: \"[src.name]\" and type: \"[src.type]\" was flagged as having ridgless but could not detect a ridgeless icon state.")
+
+	//autodetect preset states are valid
+	if((flags_marine_armor & ARMOR_PADLESS) && !(flags_marine_armor & ARMOR_PADLESS))
+		flags_marine_armor &= ~ARMOR_PADLESS
+		log_debug("CLOTHING: Armor of name: \"[src.name]\" and type: \"[src.type]\" was flagged as having padless but could not detect a padless icon state.")
+
+	if((flags_marine_armor& ARMOR_RIDGELESS) && !(flags_marine_armor & ARMOR_RIDGELESS))
+		flags_marine_armor &= ~ARMOR_RIDGELESS
+		log_debug("CLOTHING: Armor of name: \"[src.name]\" and type: \"[src.type]\" was flagged as having ridgeless but could not detect a ridgeless icon state.")
+
+/obj/item/clothing/under/verb/padless()
+	set name = "Set Padless
+	set category = "Object"
+	set src in usr
+	if(!isliving(usr))
+		return
+	if(usr.stat)
+		return
+
+	roll_suit_sleeves(TRUE, usr)
+	update_clothing_icon()
 // MARINE STORAGE ARMOR
 
 /obj/item/clothing/suit/storage/marine
 	name = "\improper M3 pattern marine armor"
 	desc = "A standard Colonial Marines M3 Pattern Chestplate. Protects the chest from ballistic rounds, bladed objects and accidents. It has a small leather pouch strapped to it for limited storage."
 	icon = 'icons/obj/items/clothing/cm_suits.dmi'
-	icon_state = "1"
-	item_state = "marine_armor" //Make unique states for Officer & Intel armors.
+	icon_state = "medium_armor"
+	item_state = "medium_armor" //Make unique states for Officer & Intel armors.
 	item_icons = list(
 		WEAR_JACKET = 'icons/mob/humans/onmob/suit_1.dmi'
 	)
@@ -119,7 +162,7 @@ var/list/squad_colors_chat = list(rgb(230,125,125), rgb(255,230,80), rgb(255,150
 	var/locate_cooldown = 0 //Cooldown for SL locator
 	var/armor_overlays[]
 	actions_types = list(/datum/action/item_action/toggle)
-	var/flags_marine_armor = ARMOR_SQUAD_OVERLAY|ARMOR_LAMP_OVERLAY
+	var/flags_marine_armor = ARMOR_SQUAD_OVERLAY|ARMOR_LAMP_OVERLAY|ARMOR_PADLESS|ARMOR_RIDGELESS
 	var/specialty = "M3 pattern marine" //Same thing here. Give them a specialty so that they show up correctly in vendors.
 	w_class = SIZE_HUGE
 	uniform_restricted = list(/obj/item/clothing/under/marine)
@@ -247,21 +290,6 @@ var/list/squad_colors_chat = list(rgb(230,125,125), rgb(255,230,80), rgb(255,150
 		if(isSynth(M) && M.allow_gun_usage == FALSE && !(flags_marine_armor & SYNTH_ALLOWED))
 			M.visible_message(SPAN_DANGER("Your programming prevents you from wearing this!"))
 			return 0
-
-/obj/item/clothing/suit/storage/marine/padded
-	name = "M3 pattern padded marine armor"
-	icon_state = "1"
-	specialty = "M3 pattern padded marine"
-
-/obj/item/clothing/suit/storage/marine/padless
-	name = "M3 pattern padless marine armor"
-	icon_state = "2"
-	specialty = "M3 pattern padless marine"
-
-/obj/item/clothing/suit/storage/marine/padless_lines
-	name = "M3 pattern ridged marine armor"
-	icon_state = "3"
-	specialty = "M3 pattern ridged marine"
 
 /obj/item/clothing/suit/storage/marine/carrier
 	name = "M3 pattern carrier marine armor"
