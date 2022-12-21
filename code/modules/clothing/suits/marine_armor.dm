@@ -98,15 +98,6 @@ var/flags_marine_armor = FALSE
 		flags_marine_armor &= ~ARMOR_RIDGELESS
 		log_debug("CLOTHING: Armor of name: \"[src.name]\" and type: \"[src.type]\" was flagged as having ridgeless but could not detect a ridgeless icon state.")
 
-/obj/item/clothing/under/verb/padless()
-	set name = "Set Padless
-	set category = "Object"
-	set src in usr
-	if(!isliving(usr))
-		return
-	if(usr.stat)
-		return
-
 	roll_suit_sleeves(TRUE, usr)
 	update_clothing_icon()
 // MARINE STORAGE ARMOR
